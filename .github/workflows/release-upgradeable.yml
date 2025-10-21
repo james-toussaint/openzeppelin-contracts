@@ -13,12 +13,10 @@ jobs:
           repository: OpenZeppelin/openzeppelin-contracts-upgradeable
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
-      - name: Fetch current non-upgradeable branch
+      - name: Run
         run: |
-          echo "Fetching ref $REF from $REMOTE"
-          git fetch "$REMOTE" master # Fetch default branch first for patch to apply cleanly
-          git fetch "$REMOTE" "$REF"
-          git checkout FETCH_HEAD
+          pwd
+          ls
         env:
           REF: ${{ github.ref }}
           REMOTE: https://github.com/${{ github.repository }}.git
