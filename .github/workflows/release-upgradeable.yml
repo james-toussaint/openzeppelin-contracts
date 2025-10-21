@@ -21,7 +21,7 @@ jobs:
       - name: Check vanilla commit
         run: |
           echo "Check"
-          git checkoutrelease-v${{ inputs.version }}
+          git checkout release-v${{ inputs.version }}
           VANILLA_COMMIT=$(git rev-parse --short HEAD)
           echo "VANILLA_COMMIT: $VANILLA_COMMIT"
       - uses: actions/checkout@v5
