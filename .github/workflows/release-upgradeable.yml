@@ -28,7 +28,7 @@ jobs:
           echo ${{ inputs.version }}
           git checkout release-v${{ inputs.version }}
           git log -1 --pretty=%B
-          if git log -1 --pretty=%B | grep -q "Transpile 41e30cdee"; then
+          if git log -1 --pretty=%B | grep -q "Transpile f1081f922"; then
             echo "Substring found"
           else
             echo "Substring not found"
