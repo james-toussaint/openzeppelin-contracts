@@ -1,7 +1,12 @@
 name: release upgradeable
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version (v0.0.0)'
+        required: true
+        type: string
 
 jobs:
   release:
@@ -20,6 +25,8 @@ jobs:
           ls
           echo AA
           cd upgradeable && ls
+          git log
+          echo ${INPUT}
         env:
           REF: ${{ github.ref }}
           REMOTE: https://github.com/${{ github.repository }}.git
