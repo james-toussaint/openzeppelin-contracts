@@ -24,14 +24,16 @@ jobs:
           pwd
           ls
           echo AA
+          VANILLA_COMMIT=$(git rev-parse --short HEAD)
+          echo "VANILLA_COMMIT: $VANILLA_COMMIT"
           cd upgradeable && ls
           echo ${{ inputs.version }}
           git checkout release-v${{ inputs.version }}
           git log -1 --pretty=%B
-          if git log -1 --pretty=%B | grep -q "Transpile f1081f922"; then
-            echo "Substring found"
+          if git log -1 --pretty=%B | grep -q "Transpile $VANILLA_COMMIT"; then
+            echo "Valid transpile version"
           else
-            echo "Substring not found"
+            echo "Wrong transpile version"
             exit 1
           fi
           ls lib
