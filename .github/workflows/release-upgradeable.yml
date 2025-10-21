@@ -7,12 +7,22 @@ on:
         description: 'version (v0.0.0)'
         required: true
         type: string
+        default: "5.5"
 
 jobs:
   release:
     environment: push-upgradeable
     runs-on: ubuntu-latest
     steps:
+      - name: Fetch current non-upgradeable branch
+        run: |
+          echo "Fetching ref $REF from $REMOTE"
+          git checkout "$REMOTE" release-v${{ inputs.version }}
+          VANILLA_COMMIT=$(git rev-parse --short HEAD)
+          echo "VANILLA_COMMIT: $VANILLA_COMMIT"
+        env:
+          REF: ${{ github.ref }}
+          REMOTE: https://github.com/${{ github.repository }}.git
       - uses: actions/checkout@v5
         with:
           repository: OpenZeppelin/openzeppelin-contracts-upgradeable
@@ -24,7 +34,6 @@ jobs:
           pwd
           ls
           echo AA
-          VANILLA_COMMIT=$(git rev-parse --short HEAD)
           echo "VANILLA_COMMIT: $VANILLA_COMMIT"
           cd upgradeable && ls
           echo ${{ inputs.version }}
