@@ -25,7 +25,6 @@ jobs:
           ls
           echo AA
           cd upgradeable && ls
-          git log
           echo ${INPUT}
         env:
           REF: ${{ github.ref }}
