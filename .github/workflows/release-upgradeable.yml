@@ -25,7 +25,7 @@ jobs:
           ls
           echo AA
           cd upgradeable && ls
-          echo ${INPUT}
+          echo ${{ inputs.version }}
         env:
           REF: ${{ github.ref }}
           REMOTE: https://github.com/${{ github.repository }}.git
