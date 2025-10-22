@@ -53,14 +53,7 @@ jobs:
           git log -1
           git tag -m {,}v$(jq -r .version package.json)
           git log -1
+          git push origin ${{ github.ref_name }}
         env:
           REF: ${{ github.ref }}
           REMOTE: https://github.com/${{ github.repository }}.git
-      - name: Set up environment
-        uses: ./.github/actions/setup
-      - run: bash scripts/git-user-config.sh
-      - name: Transpile to upgradeable
-        run: bash scripts/upgradeable/transpile-onto.sh ${{ github.ref_name }} origin/${{ github.ref_name }}
-        env:
-          SUBMODULE_REMOTE: https://github.com/${{ github.repository }}.git
-      - run: git push origin ${{ github.ref_name }}
