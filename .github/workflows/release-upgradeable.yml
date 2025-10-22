@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0
       - name: Get vanilla commit
         run: |
-          VANILLA_COMMIT=$(git rev-parse --short HEAD)
+          echo "VANILLA_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "VANILLA_COMMIT: $VANILLA_COMMIT"
       - uses: actions/checkout@v5
         with:
@@ -25,6 +25,7 @@ jobs:
           ref: ${{ github.ref }}
       - name: Run
         run: |
+          echo "VANILLA_COMMIT: $VANILLA_COMMIT"
           git log -1 --pretty=%B
           if [[ $(git log -1 --pretty=%B) != "Transpile $VANILLA_COMMIT" ]]; then
             echo "Expected 'Transpile $VANILLA_COMMIT' but found '$(git log -1 --pretty=%B)'"
@@ -32,9 +33,10 @@ jobs:
           VERSION="$(jq -r .version package.json)"
           TAG="v$VERSION"
           ### START BLOCK - TODO: Remove block
-          sed -i '' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' contracts/package.json
-          sed -i '' -e 's/$VERSION/$VERSION-$(date +%s)/g' contracts/package.json && head contracts/package.json
+          TIMESTAMPED_VERSION="$VERSION-$(date +%s)"
           TAG="$TAG-$(date +%s)"
+          sed -i '' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' contracts/package.json
+          sed -i '' -e 's/$VERSION/$TIMESTAMPED_VERSION/g' contracts/package.json && head contracts/package.json
           ### END BLOCK
           npm ci
           bash scripts/git-user-config.sh
