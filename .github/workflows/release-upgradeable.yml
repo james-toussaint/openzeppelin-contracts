@@ -1,0 +1,64 @@
+name: Release Upgradeable
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  release-upgradeable:
+    environment: push-upgradeable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          repository: OpenZeppelin/openzeppelin-contracts
+          fetch-depth: 0
+      - name: Check vanilla commit
+        run: |
+          echo "Check"
+          git log -1
+          VANILLA_COMMIT=$(git rev-parse --short HEAD)
+          echo "VANILLA_COMMIT: $VANILLA_COMMIT"
+      - uses: actions/checkout@v5
+        with:
+          repository: james-toussaint/openzeppelin-contracts-upgradeable
+          fetch-depth: 0
+          submodules: true
+          token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
+          ref: ${{ github.ref }}
+      - name: Run
+        run: |
+          git config --list
+          git log -1 --pretty=%B
+          if git log -1 --pretty=%B | grep -q "Transpile $VANILLA_COMMIT"; then
+            echo "Valid transpile version"
+          else
+            echo "Wrong transpile version"
+            exit 1
+          fi
+          npm ci
+          bash scripts/git-user-config.sh && git config --list
+          git log -1
+          VERSION=$(jq -r .version package.json)
+          TAG=v$(jq -r .version package.json)
+          git tag -m {,}$TAG
+          git tag | grep 5.5
+          git log -1
+          git remote -v
+          # todo enable next line
+          git push origin tag $TAG
+          NPM_TAG="tmp"
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            NPM_TAG="next"
+          elif [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc.*$ ]]; then
+            NPM_TAG="dev"
+          fi
+          cd contracts
+          sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' package.json && head package.json # remove before merge
+          sed -i'' -e "s/$VERSION/0.0.0-rc.1/g" "package.json" && head package.json # todo remove
+          # Intentionally escape $ to avoid interpolation and writing the token to disk
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          npm publish --tag $NPM_TAG
+        env:
+          REF: ${{ github.ref }}
+          REMOTE: https://github.com/${{ github.repository }}.git
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
