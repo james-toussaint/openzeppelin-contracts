@@ -30,6 +30,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           path: './upgradeable'
+      - run: bash scripts/git-user-config.sh
       - name: Run
         run: |
           pwd
