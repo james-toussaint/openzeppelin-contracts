@@ -51,11 +51,10 @@ jobs:
           npm ci
           bash scripts/git-user-config.sh && git config --list
           git log -1
-          git tag -m {,}v$(jq -r .version package.json)
+          git tag -m v$(jq -r .version package.json)
           git tag | grep 5.5
           git log -1
-          echo {,}v$(jq -r .version package.json)
-          git push origin tag {,}v$(jq -r .version package.json)
+          git push origin tag v$(jq -r .version package.json)
         env:
           REF: ${{ github.ref }}
           REMOTE: https://github.com/${{ github.repository }}.git
