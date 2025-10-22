@@ -1,11 +1,5 @@
 name: transpile upgradeable
 
-on:
-  push:
-    branches:
-      - master
-      - release-v*
-
 jobs:
   transpile:
     environment: push-upgradeable
