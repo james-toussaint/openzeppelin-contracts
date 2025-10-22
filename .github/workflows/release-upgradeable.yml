@@ -51,7 +51,6 @@ jobs:
           npm ci
           bash scripts/git-user-config.sh && git config --list
           git log -1
-          git tag | grep 5.5
           git tag -m {,}v$(jq -r .version package.json)
           git tag | grep 5.5
           git log -1
