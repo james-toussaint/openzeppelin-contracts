@@ -65,8 +65,7 @@ jobs:
             NPM_TAG="dev"
           fi
           cd contracts
-          sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' package.json # remove before merge
-          head package.json && npm ci # remove before merge
+          sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' package.json && head package.json # remove before merge
           # Intentionally escape $ to avoid interpolation and writing the token to disk
           echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm publish --tag $NPM_TAG
