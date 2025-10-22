@@ -30,12 +30,13 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           path: './upgradeable'
-      - run: bash scripts/git-user-config.sh
+      - run: bash scripts/git-user-config.sh && git config --list
       - name: Run
         run: |
           pwd
           ls
           echo AA
+          git config --list
           echo "VANILLA_COMMIT: $VANILLA_COMMIT"
           cd upgradeable && ls
           echo ${{ inputs.version }}
