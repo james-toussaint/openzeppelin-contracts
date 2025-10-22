@@ -12,10 +12,11 @@ jobs:
         with:
           repository: OpenZeppelin/openzeppelin-contracts
           fetch-depth: 0
+          ref: ${{ github.ref }}
       - name: Get vanilla commit
         run: |
           echo "VANILLA_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "VANILLA_COMMIT: $VANILLA_COMMIT"
+          echo "VANILLA_COMMIT: ${VANILLA_COMMIT}"
       - uses: actions/checkout@v5
         with:
           repository: james-toussaint/openzeppelin-contracts-upgradeable
