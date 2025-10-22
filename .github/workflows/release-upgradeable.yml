@@ -30,7 +30,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           path: './upgradeable'
-      - run: bash scripts/git-user-config.sh && git config --list
       - name: Run
         run: |
           pwd
@@ -50,6 +49,7 @@ jobs:
           fi
           ls lib
           npm ci
+          bash scripts/git-user-config.sh && git config --list
           git log -1
           git tag -m {,}v$(jq -r .version package.json)
           git log -1
