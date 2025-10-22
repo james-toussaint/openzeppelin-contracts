@@ -51,11 +51,20 @@ jobs:
           npm ci
           bash scripts/git-user-config.sh && git config --list
           git log -1
-          git tag -m {,}v$(jq -r .version package.json)
+          TAG=v$(jq -r .version package.json)
+          git tag -m {,}$TAG
           git tag | grep 5.5
           git log -1
           git remote -v
-          git push origin tag v$(jq -r .version package.json)
+          # todo enable next line
+          git push origin tag $TAG
+          NPM_TAG="tmp"
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            NPM_TAG="next"
+          elif [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc.*$ ]]; then
+            NPM_TAG="dev"
+          fi
+          cd contracts; npm publish --tag $NPM_TAG
         env:
           REF: ${{ github.ref }}
           REMOTE: https://github.com/${{ github.repository }}.git
