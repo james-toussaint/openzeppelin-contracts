@@ -37,8 +37,12 @@ jobs:
           echo "$TIMESTAMPED_VERSION"
           TAG="$TAG-$(date +%s)"
           echo "$TAG"
+          ls
+          ls contracts
           sed -i '' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' contracts/package.json
-          sed -i '' -e "s/$VERSION/$TIMESTAMPED_VERSION/g" contracts/package.json && head contracts/package.json
+          head contracts/package.json
+          sed -i '' -e "s/$VERSION/$TIMESTAMPED_VERSION/g" contracts/package.json
+          head contracts/package.json
           ### END BLOCK
           npm ci
           bash scripts/git-user-config.sh
