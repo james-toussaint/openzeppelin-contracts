@@ -51,6 +51,7 @@ jobs:
           npm ci
           bash scripts/git-user-config.sh && git config --list
           git log -1
+          VERSION=$(jq -r .version package.json)
           TAG=v$(jq -r .version package.json)
           git tag -m {,}$TAG
           git tag | grep 5.5
@@ -66,7 +67,7 @@ jobs:
           fi
           cd contracts
           sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' package.json && head package.json # remove before merge
-          sed -i'' -e "s/$TAG/v0.0.0-rc.1/g" "package.json" && head package.json # todo remove
+          sed -i'' -e "s/$VERSION/0.0.0-rc.1/g" "package.json" && head package.json # todo remove
           # Intentionally escape $ to avoid interpolation and writing the token to disk
           echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm publish --tag $NPM_TAG
