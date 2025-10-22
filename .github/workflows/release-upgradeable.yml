@@ -28,8 +28,9 @@ jobs:
         with:
           repository: james-toussaint/openzeppelin-contracts-upgradeable
           fetch-depth: 0
+          submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
-          path: './upgradeable'
+          ref: release-v${{ inputs.version }}
       - name: Run
         run: |
           pwd
@@ -37,9 +38,8 @@ jobs:
           echo AA
           git config --list
           echo "VANILLA_COMMIT: $VANILLA_COMMIT"
-          cd upgradeable && ls
+          ls
           echo ${{ inputs.version }}
-          git checkout release-v${{ inputs.version }}
           git log -1 --pretty=%B
           if git log -1 --pretty=%B | grep -q "Transpile $VANILLA_COMMIT"; then
             echo "Valid transpile version"
