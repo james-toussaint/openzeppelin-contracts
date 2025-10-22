@@ -29,12 +29,16 @@ jobs:
             echo "Expected 'Transpile $VANILLA_COMMIT' but found '$(git log -1 --pretty=%B)'"
           fi
           VERSION="$(jq -r .version package.json)"
+          echo "$VERSION"
           TAG="v$VERSION"
+          echo "$TAG"
           ### START BLOCK - TODO: Remove block
           TIMESTAMPED_VERSION="$VERSION-$(date +%s)"
+          echo "$TIMESTAMPED_VERSION"
           TAG="$TAG-$(date +%s)"
+          echo "$TAG"
           sed -i '' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' contracts/package.json
-          sed -i '' -e 's/$VERSION/$TIMESTAMPED_VERSION/g' contracts/package.json && head contracts/package.json
+          sed -i '' -e "s/$VERSION/$TIMESTAMPED_VERSION/g" contracts/package.json && head contracts/package.json
           ### END BLOCK
           npm ci
           bash scripts/git-user-config.sh
