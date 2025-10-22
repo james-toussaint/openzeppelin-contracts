@@ -15,6 +15,7 @@ jobs:
       - name: Get vanilla commit
         run: |
           VANILLA_COMMIT=$(git rev-parse --short HEAD)
+          echo "VANILLA_COMMIT: $VANILLA_COMMIT"
       - uses: actions/checkout@v5
         with:
           repository: james-toussaint/openzeppelin-contracts-upgradeable
@@ -24,7 +25,8 @@ jobs:
           ref: ${{ github.ref }}
       - name: Run
         run: |
-          if [[ $(git log -1 --pretty=%B) != "Transpile $VANILLA_COMMIT" ]] ; then
+          git log -1 --pretty=%B
+          if [[ $(git log -1 --pretty=%B) != "Transpile $VANILLA_COMMIT" ]]; then
             echo "Expected 'Transpile $VANILLA_COMMIT' but found '$(git log -1 --pretty=%B)'"
           fi
           VERSION="$(jq -r .version package.json)"
