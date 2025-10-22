@@ -64,7 +64,12 @@ jobs:
           elif [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc.*$ ]]; then
             NPM_TAG="dev"
           fi
-          cd contracts; npm publish --tag $NPM_TAG
+          cd contracts
+          sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' package.json # remove before merge
+          head package.json && npm ci # remove before merge
+          # Intentionally escape $ to avoid interpolation and writing the token to disk
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          npm publish --tag $NPM_TAG
         env:
           REF: ${{ github.ref }}
           REMOTE: https://github.com/${{ github.repository }}.git
