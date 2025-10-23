@@ -18,7 +18,7 @@ jobs:
           echo "VANILLA_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - uses: actions/checkout@v5
         with:
-          repository: james-toussaint/openzeppelin-contracts-upgradeable
+          repository: james-toussaint/openzeppelin-contracts-upgradeable # TODO: Update repo before merging
           fetch-depth: 0
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
@@ -29,35 +29,35 @@ jobs:
             echo "Expected 'Transpile $VANILLA_COMMIT' but found '$(git log -1 --pretty=%B)'"
           fi
           VERSION="$(jq -r .version package.json)"
-          echo "$VERSION"
-          TAG="v$VERSION"
-          echo "$TAG"
-          ### START BLOCK - TODO: Remove block
+          GIT_TAG="v$VERSION"
+          NPM_TAG="tmp"
+          if [[ "$GIT_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            NPM_TAG="dev"
+          elif [[ "$GIT_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc.[0-9]+$ ]]; then
+            NPM_TAG="next"
+          fi
+          ### [START BLOCK] TODO: Remove block before merging
           TIMESTAMPED_VERSION="$VERSION-$(date +%s)"
-          echo "$TIMESTAMPED_VERSION"
-          TAG="$TAG-$(date +%s)"
-          echo "$TAG"
-          ls
-          ls contracts
-          head contracts/package.json
-          sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' contracts/package.json
-          head contracts/package.json
-          sed -i'' -e "s/$VERSION/$TIMESTAMPED_VERSION/g" contracts/package.json
-          head contracts/package.json
-          ### END BLOCK
+          GIT_TAG="$GIT_TAG-$(date +%s)" # incremental git tag for testing
+          sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' contracts/package.json # custom scope for testing
+          sed -i'' -e "s/$VERSION/$TIMESTAMPED_VERSION/g" contracts/package.json && head contracts/package.json # incremental npm package version for testing
+          ### [END BLOCK]
           npm ci
           bash scripts/git-user-config.sh
-          git tag -m {,}$TAG
-          git push origin tag $TAG
-          NPM_TAG="tmp"
-          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            NPM_TAG="next"
-          elif [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc.[0-9]+$ ]]; then
-            NPM_TAG="dev"
-          fi
+          git tag -m {,}$GIT_TAG
+          CI=true git push origin tag $GIT_TAG
           cd contracts
           # Intentionally escape $ to avoid interpolation and writing the token to disk
           echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm publish --tag $NPM_TAG
+          echo "GIT_TAG=${GIT_TAG}" >> $GITHUB_ENV
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create Github Release Note
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
+        run: |
+          gh release create "$GIT_TAG" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="${GITHUB_REPOSITORY#*/} ${GIT_TAG}" \
+              --generate-notes
