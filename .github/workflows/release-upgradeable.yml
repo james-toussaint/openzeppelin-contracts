@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          repository: ${VANILLA_REPO}
+          repository: ${{ env.VANILLA_REPO }}
           fetch-depth: 0
           ref: ${{ github.ref }}
       - name: Get vanilla commit
@@ -21,7 +21,7 @@ jobs:
           echo "VANILLA_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - uses: actions/checkout@v5
         with:
-          repository: ${UPGRADEABLE_REPO}
+          repository: ${{ env.UPGRADEABLE_REPO }}
           fetch-depth: 0
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
