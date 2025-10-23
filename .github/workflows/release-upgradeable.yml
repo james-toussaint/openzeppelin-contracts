@@ -58,6 +58,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
         run: |
           gh release create "$GIT_TAG" \
-              --repo="$GITHUB_REPOSITORY" \
-              --title="${GITHUB_REPOSITORY#*/} ${GIT_TAG}" \
-              --generate-notes
+              --repo="james-toussaint/openzeppelin-contracts-upgradeable" \
+              --title="${GIT_TAG}" \
+              --notes="$(gh release view v5.5.0-rc.1 --repo="OpenZeppelin/openzeppelin-contracts" --json body -q .body)"
