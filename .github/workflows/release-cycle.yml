@@ -150,15 +150,16 @@ jobs:
         with:
           name: ${{ github.ref_name }}
           path: ${{ steps.pack.outputs.tarball }}
-      - name: Set env
-        run: echo "RELEASE_COMMIT=$(git log -1 --format=%H)" >> ${GITHUB_ENV}
       - name: Publish
+        if: false
         run: bash scripts/release/workflow/publish.sh
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           TARBALL: ${{ steps.pack.outputs.tarball }}
           TAG: ${{ steps.pack.outputs.tag }}
           NPM_CONFIG_PROVENANCE: true
+      - name: Set release commit
+        run: echo "RELEASE_COMMIT=$(git log -1 --format=%H)" >> ${GITHUB_ENV}
       - name: Create Github Release
         uses: actions/github-script@v8
         env:
