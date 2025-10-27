@@ -40,11 +40,11 @@ jobs:
           script: await require('./scripts/release/workflow/state.js')({ github, context, core })
     outputs:
       # Job Flags
-      start: ${{ steps.state.outputs.start }}
-      changesets: ${{ steps.state.outputs.changesets }}
-      promote: ${{ steps.state.outputs.promote }}
-      publish: ${{ steps.state.outputs.publish }}
-      merge: ${{ steps.state.outputs.merge }}
+      start: false
+      changesets: false
+      promote: false
+      publish: true
+      merge: false
 
       # Global variables
       is_prerelease: ${{ steps.state.outputs.is_prerelease }}
@@ -139,16 +139,19 @@ jobs:
       - name: Set up environment
         uses: ./.github/actions/setup
       - id: pack
+        if: false
         name: Pack
         run: bash scripts/release/workflow/pack.sh
         env:
           PRERELEASE: ${{ needs.state.outputs.is_prerelease }}
       - name: Upload tarball artifact
+        if: false
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.ref_name }}
           path: ${{ steps.pack.outputs.tarball }}
       - name: Publish
+        if: false
         run: bash scripts/release/workflow/publish.sh
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -167,6 +170,7 @@ jobs:
       tarball_name: ${{ steps.pack.outputs.tarball_name }}
 
   integrity_check:
+    if: false
     needs: publish
     name: Tarball Integrity Check
     runs-on: ubuntu-latest
