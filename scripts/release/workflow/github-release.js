@@ -7,6 +7,7 @@ module.exports = async ({ github, context }) => {
 
   console.log('version', version);
   console.log('ref_name', github.ref_name);
+  console.log(github);
 
   await github.rest.repos.createRelease({
     owner: context.repo.owner,
