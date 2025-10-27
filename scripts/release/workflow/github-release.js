@@ -7,13 +7,14 @@ module.exports = async ({ github, context }) => {
 
   console.log('version', version);
   console.log('ref_name', github.ref_name);
+  console.log('release_commit', process.env.RELEASE_COMMIT);
   console.log(github);
 
   await github.rest.repos.createRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
     tag_name: `v${version}`,
-    target_commitish: github.ref_name,
+    target_commitish: process.env.RELEASE_COMMIT,
     body: extractSection(changelog, version),
     prerelease: process.env.PRERELEASE === 'true',
   });
