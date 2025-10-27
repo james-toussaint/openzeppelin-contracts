@@ -158,16 +158,11 @@ jobs:
           TARBALL: ${{ steps.pack.outputs.tarball }}
           TAG: ${{ steps.pack.outputs.tag }}
           NPM_CONFIG_PROVENANCE: true
-      - name: Add release commit to env
-        run: |
-          echo "RELEASE_COMMIT=$(git log -1 --format=%H)" >> "${GITHUB_ENV}" 
-          echo ${{ github.ref }}
-          echo ${{ github.ref_name }}
-          echo ${{ github.sha }}
       - name: Create Github Release
         uses: actions/github-script@v8
         env:
           PRERELEASE: ${{ needs.state.outputs.is_prerelease }}
+          RELEASE_COMMIT: ${{ github.sha }}
         with:
           script: await require('./scripts/release/workflow/github-release.js')({ github, context })
     outputs:
