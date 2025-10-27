@@ -5,6 +5,13 @@ const { version } = require(join(__dirname, '../../../package.json'));
 module.exports = async ({ github, context }) => {
   const changelog = readFileSync('CHANGELOG.md', 'utf8');
 
+  console.log(context);
+  console.log('*****');
+  console.log(github);
+  console.log(github.ref);
+  console.log(github.ref_name);
+  console.log(github.sha);
+
   const releaseCommit = process.env.RELEASE_COMMIT;
   if (!releaseCommit) {
     console.error('`RELEASE_COMMIT` env var is required.');
