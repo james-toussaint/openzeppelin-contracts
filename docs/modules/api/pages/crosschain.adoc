@@ -1,0 +1,107 @@
+:github-icon: pass:[<svg class="icon"><use href="#github-icon"/></svg>]
+:ERC7786Recipient: pass:normal[xref:crosschain.adoc#ERC7786Recipient[`ERC7786Recipient`]]
+:xref-ERC7786Recipient-receiveMessage-bytes32-bytes-bytes-: xref:crosschain.adoc#ERC7786Recipient-receiveMessage-bytes32-bytes-bytes-
+:xref-ERC7786Recipient-_isAuthorizedGateway-address-bytes-: xref:crosschain.adoc#ERC7786Recipient-_isAuthorizedGateway-address-bytes-
+:xref-ERC7786Recipient-_processMessage-address-bytes32-bytes-bytes-: xref:crosschain.adoc#ERC7786Recipient-_processMessage-address-bytes32-bytes-bytes-
+:xref-ERC7786Recipient-ERC7786RecipientUnauthorizedGateway-address-bytes-: xref:crosschain.adoc#ERC7786Recipient-ERC7786RecipientUnauthorizedGateway-address-bytes-
+:xref-ERC7786Recipient-ERC7786RecipientMessageAlreadyProcessed-address-bytes32-: xref:crosschain.adoc#ERC7786Recipient-ERC7786RecipientMessageAlreadyProcessed-address-bytes32-
+:InteroperableAddress: pass:normal[xref:utils.adoc#InteroperableAddress[`InteroperableAddress`]]
+= Cross chain interoperability
+
+[.readme-notice]
+NOTE: This document is better viewed at https://docs.openzeppelin.com/contracts/api/crosschain
+
+This directory contains contracts for sending and receiving cross chain messages that follows the ERC-7786 standard.
+
+- {ERC7786Recipient}: generic ERC-7786 crosschain contract that receives messages from a trusted gateway
+
+== Helpers
+
+:ERC7786RecipientUnauthorizedGateway: pass:normal[xref:#ERC7786Recipient-ERC7786RecipientUnauthorizedGateway-address-bytes-[`++ERC7786RecipientUnauthorizedGateway++`]]
+:ERC7786RecipientMessageAlreadyProcessed: pass:normal[xref:#ERC7786Recipient-ERC7786RecipientMessageAlreadyProcessed-address-bytes32-[`++ERC7786RecipientMessageAlreadyProcessed++`]]
+:receiveMessage: pass:normal[xref:#ERC7786Recipient-receiveMessage-bytes32-bytes-bytes-[`++receiveMessage++`]]
+:_isAuthorizedGateway: pass:normal[xref:#ERC7786Recipient-_isAuthorizedGateway-address-bytes-[`++_isAuthorizedGateway++`]]
+:_processMessage: pass:normal[xref:#ERC7786Recipient-_processMessage-address-bytes32-bytes-bytes-[`++_processMessage++`]]
+
+:receiveMessage-bytes32-bytes-bytes: pass:normal[xref:#ERC7786Recipient-receiveMessage-bytes32-bytes-bytes-[`++receiveMessage++`]]
+:_isAuthorizedGateway-address-bytes: pass:normal[xref:#ERC7786Recipient-_isAuthorizedGateway-address-bytes-[`++_isAuthorizedGateway++`]]
+:_processMessage-address-bytes32-bytes-bytes: pass:normal[xref:#ERC7786Recipient-_processMessage-address-bytes32-bytes-bytes-[`++_processMessage++`]]
+
+[.contract]
+[[ERC7786Recipient]]
+=== `++ERC7786Recipient++` link:https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.4.0/contracts/crosschain/ERC7786Recipient.sol[{github-icon},role=heading-link]
+
+[.hljs-theme-light.nopadding]
+```solidity
+import "@openzeppelin/contracts/crosschain/ERC7786Recipient.sol";
+```
+
+Base implementation of an ERC-7786 compliant cross-chain message receiver.
+
+This abstract contract exposes the `receiveMessage` function that is used for communication with (one or multiple)
+destination gateways. This contract leaves two functions unimplemented:
+
+* {_isAuthorizedGateway}, an internal getter used to verify whether an address is recognised by the contract as a
+valid ERC-7786 destination gateway. One or multiple gateway can be supported. Note that any malicious address for
+which this function returns true would be able to impersonate any account on any other chain sending any message.
+
+* {_processMessage}, the internal function that will be called with any message that has been validated.
+
+This contract implements replay protection, meaning that if two messages are received from the same gateway with the
+same `receiveId`, then the second one will NOT be executed, regardless of the result of {_isAuthorizedGateway}.
+
+[.contract-index]
+.Functions
+--
+* {xref-ERC7786Recipient-receiveMessage-bytes32-bytes-bytes-}[`++receiveMessage(receiveId, sender, payload)++`]
+* {xref-ERC7786Recipient-_isAuthorizedGateway-address-bytes-}[`++_isAuthorizedGateway(gateway, sender)++`]
+* {xref-ERC7786Recipient-_processMessage-address-bytes32-bytes-bytes-}[`++_processMessage(gateway, receiveId, sender, payload)++`]
+
+[.contract-subindex-inherited]
+.IERC7786Recipient
+
+--
+
+[.contract-index]
+.Errors
+--
+* {xref-ERC7786Recipient-ERC7786RecipientUnauthorizedGateway-address-bytes-}[`++ERC7786RecipientUnauthorizedGateway(gateway, sender)++`]
+* {xref-ERC7786Recipient-ERC7786RecipientMessageAlreadyProcessed-address-bytes32-}[`++ERC7786RecipientMessageAlreadyProcessed(gateway, receiveId)++`]
+
+[.contract-subindex-inherited]
+.IERC7786Recipient
+
+--
+
+[.contract-item]
+[[ERC7786Recipient-receiveMessage-bytes32-bytes-bytes-]]
+==== `[.contract-item-name]#++receiveMessage++#++(bytes32 receiveId, bytes sender, bytes payload) → bytes4++` [.item-kind]#external#
+
+Endpoint for receiving cross-chain message.
+
+This function may be called directly by the gateway.
+
+[.contract-item]
+[[ERC7786Recipient-_isAuthorizedGateway-address-bytes-]]
+==== `[.contract-item-name]#++_isAuthorizedGateway++#++(address gateway, bytes sender) → bool++` [.item-kind]#internal#
+
+Virtual getter that returns whether an address is a valid ERC-7786 gateway for a given sender.
+
+The `sender` parameter is an interoperable address that include the source chain. The chain part can be
+extracted using the {InteroperableAddress} library to selectively authorize gateways based on the origin chain
+of a message.
+
+[.contract-item]
+[[ERC7786Recipient-_processMessage-address-bytes32-bytes-bytes-]]
+==== `[.contract-item-name]#++_processMessage++#++(address gateway, bytes32 receiveId, bytes sender, bytes payload)++` [.item-kind]#internal#
+
+Virtual function that should contain the logic to execute when a cross-chain message is received.
+
+[.contract-item]
+[[ERC7786Recipient-ERC7786RecipientUnauthorizedGateway-address-bytes-]]
+==== `[.contract-item-name]#++ERC7786RecipientUnauthorizedGateway++#++(address gateway, bytes sender)++` [.item-kind]#error#
+
+[.contract-item]
+[[ERC7786Recipient-ERC7786RecipientMessageAlreadyProcessed-address-bytes32-]]
+==== `[.contract-item-name]#++ERC7786RecipientMessageAlreadyProcessed++#++(address gateway, bytes32 receiveId)++` [.item-kind]#error#
+

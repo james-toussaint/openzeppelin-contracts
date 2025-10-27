@@ -1,0 +1,4 @@
+name: Release Upgradeable
+
+on:
+  workflow_dispatch: {}

@@ -1,0 +1,37 @@
+#  D: Manual Dispatch
+#  M: Merge release PR
+#  C: Commit
+#  ┌───────────┐     ┌─────────────┐     ┌────────────────┐
+#  │Development├──D──►RC-Unreleased│  ┌──►Final-Unreleased│
+#  └───────────┘     └─┬─────────▲─┘  │  └─┬────────────▲─┘
+#                      │         │    │    │            │
+#                      M         C    D    M            C
+#                      │         │    │    │            │
+#                     ┌▼─────────┴┐   │   ┌▼────────────┴┐
+#                     │RC-Released├───┘   │Final-Released│
+#                     └───────────┘       └──────────────┘
+name: Release Cycle
+
+on:
+  push:
+    branches:
+      - release-v*
+  workflow_dispatch: {}
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  publish:
+    name: Publish
+    environment: npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - name: Create Github Release
+        uses: actions/github-script@v8
+        env:
+          PRERELEASE: true
+        with:
+          script: await require('./scripts/release/workflow/github-release.js')({ github, context })
