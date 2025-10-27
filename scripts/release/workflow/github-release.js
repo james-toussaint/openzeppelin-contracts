@@ -11,6 +11,8 @@ module.exports = async ({ github, context }) => {
   console.log(github);
   console.log(github.ref);
   console.log(github.ref_name);
+  console.log(await github.ref_name());
+  console.log(await github.ref_name);
   console.log(github.sha);
 
   const releaseCommit = process.env.RELEASE_COMMIT;
