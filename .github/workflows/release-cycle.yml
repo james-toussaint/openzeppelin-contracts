@@ -40,11 +40,11 @@ jobs:
           script: await require('./scripts/release/workflow/state.js')({ github, context, core })
     outputs:
       # Job Flags
-      start: ${{ steps.state.outputs.start }}
-      changesets: ${{ steps.state.outputs.changesets }}
-      promote: ${{ steps.state.outputs.promote }}
-      publish: ${{ steps.state.outputs.publish }}
-      merge: ${{ steps.state.outputs.merge }}
+      start: false
+      changesets: false
+      promote: false
+      publish: true
+      merge: false
 
       # Global variables
       is_prerelease: ${{ steps.state.outputs.is_prerelease }}
