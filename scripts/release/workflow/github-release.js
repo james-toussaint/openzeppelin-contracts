@@ -5,6 +5,9 @@ const { version } = require(join(__dirname, '../../../package.json'));
 module.exports = async ({ github, context }) => {
   const changelog = readFileSync('CHANGELOG.md', 'utf8');
 
+  console.log('version', version);
+  console.log('ref_name', github.ref_name);
+
   await github.rest.repos.createRelease({
     owner: context.repo.owner,
     repo: context.repo.repo,
