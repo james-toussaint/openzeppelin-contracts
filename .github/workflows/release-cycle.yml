@@ -159,7 +159,11 @@ jobs:
           TAG: ${{ steps.pack.outputs.tag }}
           NPM_CONFIG_PROVENANCE: true
       - name: Add release commit to env
-        run: echo "RELEASE_COMMIT=$(git log -1 --format=%H)" >> "${GITHUB_ENV}"
+        run: |
+          echo "RELEASE_COMMIT=$(git log -1 --format=%H)" >> "${GITHUB_ENV}" 
+          echo ${{ github.ref }}
+          echo ${{ github.ref_name }}
+          echo ${{ github.sha }}
       - name: Create Github Release
         uses: actions/github-script@v8
         env:

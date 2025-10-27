@@ -6,6 +6,7 @@ module.exports = async ({ github, context }) => {
   const changelog = readFileSync('CHANGELOG.md', 'utf8');
 
   console.log(context);
+  console.log(context.sha);
   console.log('*****');
   console.log(github);
   console.log(github.ref);
