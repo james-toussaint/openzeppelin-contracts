@@ -30,6 +30,7 @@ jobs:
           cd $VANILLA_DIR
           echo "commit=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5 # TODO: Remove this 2 lines before merging (used to get node 24.x from setup action)
+        with:  
           path: $VANILLA_DIR
       - name: Set up environment
         uses: $VANILLA_DIR/.github/actions/setup
