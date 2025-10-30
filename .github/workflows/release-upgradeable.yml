@@ -28,6 +28,7 @@ jobs:
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
+      - run: cat ./.github/actions/setup/action.yml  
       - name: Set up environment
         uses: ./.github/actions/setup
       - run: bash scripts/git-user-config.sh
