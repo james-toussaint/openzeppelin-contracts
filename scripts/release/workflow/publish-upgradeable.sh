@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd $UPGRADEABLE_DIR
+
 if ! git log -1 --pretty=%B | grep -q "Transpile ${VANILLA_COMMIT}"; then
   echo "Expected 'Transpile ${VANILLA_COMMIT}' but found '$(git log -1 --pretty=%B)'"
   exit 1
