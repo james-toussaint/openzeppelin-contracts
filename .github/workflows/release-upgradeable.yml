@@ -14,22 +14,15 @@ jobs:
       VANILLA_REPO: OpenZeppelin/openzeppelin-contracts
       UPGRADEABLE_REPO: james-toussaint/openzeppelin-contracts-upgradeable # TODO: Update repo before merging
     steps:
-      - run: |
-          pwd
-          echo "ROOT=$(pwd)" >> "$GITHUB_ENV"
-          echo "VANILLA_DIR=$(pwd)" >> "$GITHUB_ENV"
-          echo "UPGRADEABLE_DIR=$(pwd)/upgradeable" >> "$GITHUB_ENV"
+      - run: echo "UPGRADEABLE_DIR=${{ github.workspace }}/upgradeable" >> "$GITHUB_ENV"
       - uses: actions/checkout@v5
         with:
           repository: ${{ env.VANILLA_REPO }}
           ref: ${{ github.ref }}
       - id: vanilla
         name: Get vanilla commit
-        run: |
-          pwd
-          ls -la      
-          echo "commit=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v5 # TODO: Remove this 2 lines before merging (used to get node 24.x from setup action)
+        run: echo "commit=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v5 # TODO: Remove this before merging (used to get node 24.x from setup action)
       - name: Set up environment
         uses: ./.github/actions/setup
       - uses: actions/checkout@v5
@@ -39,7 +32,6 @@ jobs:
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
           path: upgradeable
-      - run: tree "${ROOT}" && ls -la "${VANILLA_DIR}" && ls -la "${UPGRADEABLE_DIR}"
       - run: bash scripts/git-user-config.sh
       - id: publish
         name: Publish
