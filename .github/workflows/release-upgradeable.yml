@@ -56,6 +56,7 @@ jobs:
           sed -i'' -e 's/openzeppelin\/contracts-upgradeable/james-toussaint\/contracts-upgradeable/g' contracts/package.json # custom scope for testing
           sed -i'' -e "s/${VERSION}/${TIMESTAMPED_VERSION}/g" contracts/package.json && head contracts/package.json # incremental npm package version for testing
           ### [END BLOCK]
+          sed -i'' -e 's/OpenZeppelin\/openzeppelin-contracts-upgradeable/james-toussaint\/openzeppelin-contracts/g' contracts/package.json # repository.url for provenance (TODO: Keep upgradeable url)
           git tag -m {,}"${GIT_TAG}"
           CI=true git push origin tag "${GIT_TAG}"
           npm ci
