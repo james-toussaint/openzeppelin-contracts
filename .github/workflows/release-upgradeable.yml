@@ -31,7 +31,8 @@ jobs:
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
-      - run: bash scripts/git-user-config.sh
+          path: ./upgradeable
+      - run: pwd && ls && cd ./upgradeable && bash scripts/git-user-config.sh
       - id: publish
         name: Publish
         run: bash scripts/release/workflow/publish-upgradeable.sh
