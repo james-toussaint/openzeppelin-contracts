@@ -27,6 +27,11 @@ jobs:
       - id: vanilla
         name: Get vanilla commit
         run: |
+          pwd
+          ls -la
+          cd ..
+          pwd
+          ls -la        
           cd $VANILLA_DIR
           echo "commit=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5 # TODO: Remove this 2 lines before merging (used to get node 24.x from setup action)
