@@ -60,7 +60,7 @@ jobs:
           CI=true git push origin tag "${GIT_TAG}"
           npm ci
           cd "contracts/"
-          npm publish
+          npm publish --tag "${NPM_TAG}"
           echo "GIT_TAG=${GIT_TAG}" >> "$GITHUB_ENV"
       - name: Create Github Release Note
         env:
