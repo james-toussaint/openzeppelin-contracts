@@ -13,8 +13,8 @@ jobs:
     env:
       VANILLA_REPO: OpenZeppelin/openzeppelin-contracts
       UPGRADEABLE_REPO: james-toussaint/openzeppelin-contracts-upgradeable # TODO: Update repo before merging
-      UPGRADEABLE_DIR: /upgradeable
     steps:
+      - run: echo "UPGRADEABLE_DIR=${GITHUB_WORKSPACE}/upgradeable" >> "$GITHUB_ENV"
       - uses: actions/checkout@v5
         with:
           repository: ${{ env.VANILLA_REPO }}
