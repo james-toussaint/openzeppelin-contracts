@@ -33,7 +33,7 @@ jobs:
         with:  
           path: $VANILLA_DIR
       - name: Set up environment
-        uses: $VANILLA_DIR/.github/actions/setup
+        uses: ./.github/actions/setup
       - uses: actions/checkout@v5
         with:
           repository: ${{ env.UPGRADEABLE_REPO }}
