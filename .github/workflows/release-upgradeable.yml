@@ -22,14 +22,14 @@ jobs:
       - name: Get vanilla commit
         run: |
           echo "VANILLA_COMMIT=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+      - name: Set up environment
+        uses: ./.github/actions/setup
       - uses: actions/checkout@v5
         with:
           repository: ${{ env.UPGRADEABLE_REPO }}
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
-      - name: Set up environment
-        uses: ./.github/actions/setup
       - run: bash scripts/git-user-config.sh
       - name: Run
         run: |
