@@ -23,20 +23,18 @@ jobs:
         with:
           repository: ${{ env.VANILLA_REPO }}
           ref: ${{ github.ref }}
-          path: $VANILLA_DIR
+          path: "${VANILLA_DIR}"
       - id: vanilla
         name: Get vanilla commit
         run: |
           pwd
-          ls -la
-          cd ..
-          pwd
-          ls -la        
-          cd $VANILLA_DIR
+          ls -la      
+          ls -la "${VANILLA_DIR}"      
+          cd "${VANILLA_DIR}"
           echo "commit=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5 # TODO: Remove this 2 lines before merging (used to get node 24.x from setup action)
         with:  
-          path: $VANILLA_DIR
+          path: "${VANILLA_DIR}"
       - name: Set up environment
         uses: ./.github/actions/setup
       - uses: actions/checkout@v5
@@ -45,16 +43,16 @@ jobs:
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
-          path: $UPGRADEABLE_DIR
-      - run: tree $ROOT
-      - run: bash $VANILLA_DIR/scripts/git-user-config.sh
+          path: "${UPGRADEABLE_DIR}"
+      - run: tree "${ROOT}"
+      - run: bash "${VANILLA_DIR}/scripts/git-user-config.sh"
       - id: publish
         name: Publish
-        run: bash $VANILLA_DIR/scripts/release/workflow/publish-upgradeable.sh
+        run: bash "${VANILLA_DIR}/scripts/release/workflow/publish-upgradeable.sh"
         env:
           VANILLA_COMMIT: ${{ steps.vanilla.outputs.commit }}
       - name: Create Github Release Note
-        run: bash $VANILLA_DIR/scripts/release/workflow/github-release-upgradeable.sh
+        run: bash "${VANILLA_DIR}/scripts/release/workflow/github-release-upgradeable.sh"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           GIT_TAG: ${{ steps.publish.outputs.git_tag }}
