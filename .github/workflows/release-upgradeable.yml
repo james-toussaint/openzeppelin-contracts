@@ -23,7 +23,7 @@ jobs:
         with:
           repository: ${{ env.VANILLA_REPO }}
           ref: ${{ github.ref }}
-          path: "${VANILLA_DIR}"
+          path: vanilla
       - id: vanilla
         name: Get vanilla commit
         run: |
@@ -43,7 +43,7 @@ jobs:
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
-          path: "${UPGRADEABLE_DIR}"
+          path: upagradeable
       - run: tree "${ROOT}"
       - run: bash "${VANILLA_DIR}/scripts/git-user-config.sh"
       - id: publish
