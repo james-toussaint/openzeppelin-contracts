@@ -34,9 +34,9 @@ jobs:
           echo "commit=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5 # TODO: Remove this 2 lines before merging (used to get node 24.x from setup action)
         with:  
-          path: "${VANILLA_DIR}"
+          path: vanilla
       - name: Set up environment
-        uses: ./.github/actions/setup
+        uses: vanilla/.github/actions/setup
       - uses: actions/checkout@v5
         with:
           repository: ${{ env.UPGRADEABLE_REPO }}
