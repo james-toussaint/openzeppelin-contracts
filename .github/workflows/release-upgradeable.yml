@@ -3,6 +3,10 @@ name: Release Upgradeable
 on:
   workflow_dispatch: {}
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   release-upgradeable:
     environment: push-upgradeable
@@ -54,12 +58,8 @@ jobs:
           git tag -m {,}"${GIT_TAG}"
           CI=true git push origin tag "${GIT_TAG}"
           cd "contracts/"
-          # Intentionally escape $ to avoid interpolation and writing the token to disk
-          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm publish --tag "${NPM_TAG}"
           echo "GIT_TAG=${GIT_TAG}" >> "$GITHUB_ENV"
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create Github Release Note
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
