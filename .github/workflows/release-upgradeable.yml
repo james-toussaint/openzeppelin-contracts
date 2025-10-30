@@ -7,7 +7,7 @@ jobs:
   release-upgradeable:
     environment: push-upgradeable
     permissions:
-      id-token: write  # Required for OIDC
+      id-token: write # Required for OIDC
       contents: read
     runs-on: ubuntu-latest
     env:
@@ -32,7 +32,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
           path: upgradeable
-      - run: bash scripts/git-user-config.sh
+      - run: cd "${UPGRADEABLE_DIR}" && bash ${{ github.workspace }}/scripts/git-user-config.sh
       - id: publish
         name: Publish
         run: bash scripts/release/workflow/publish-upgradeable.sh
