@@ -16,6 +16,10 @@ jobs:
       UPGRADEABLE_REPO: james-toussaint/openzeppelin-contracts-upgradeable # TODO: Update repo before merging
     steps:
       - uses: actions/checkout@v5
+      - name: Set up environment
+        uses: ./.github/actions/setup
+      - run: bash scripts/git-user-config.sh
+      - uses: actions/checkout@v5
         with:
           repository: ${{ env.VANILLA_REPO }}
           ref: ${{ github.ref }}
@@ -28,10 +32,6 @@ jobs:
           submodules: true
           token: ${{ secrets.GH_TOKEN_UPGRADEABLE }}
           ref: ${{ github.ref }}
-      - run: cat ./.github/actions/setup/action.yml  
-      - name: Set up environment
-        uses: ./.github/actions/setup
-      - run: bash scripts/git-user-config.sh
       - name: Run
         run: |
           if ! git log -1 --pretty=%B | grep -q "Transpile ${VANILLA_COMMIT}"; then
@@ -58,6 +58,7 @@ jobs:
           ### [END BLOCK]
           git tag -m {,}"${GIT_TAG}"
           CI=true git push origin tag "${GIT_TAG}"
+          npm ci
           cd "contracts/"
           npm publish
           echo "GIT_TAG=${GIT_TAG}" >> "$GITHUB_ENV"
