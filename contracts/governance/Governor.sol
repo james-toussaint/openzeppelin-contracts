@@ -9,7 +9,7 @@ import {EIP712} from "../utils/cryptography/EIP712.sol";
 import {SignatureChecker} from "../utils/cryptography/SignatureChecker.sol";
 import {IERC165, ERC165} from "../utils/introspection/ERC165.sol";
 import {SafeCast} from "../utils/math/SafeCast.sol";
-import {DoubleEndedQueue} from "../utils/structs/DoubleEndedQueue.sol";
+import {EnumerableSet} from "../utils/structs/EnumerableSet.sol";
 import {Address} from "../utils/Address.sol";
 import {Context} from "../utils/Context.sol";
 import {Nonces} from "../utils/Nonces.sol";
@@ -26,7 +26,7 @@ import {IGovernor, IERC6372} from "./IGovernor.sol";
  * - Additionally, {votingPeriod}, {votingDelay}, and {quorum} must also be implemented
  */
 abstract contract Governor is Context, ERC165, EIP712, Nonces, IGovernor, IERC721Receiver, IERC1155Receiver {
-    using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
+    using EnumerableSet for EnumerableSet.Bytes32Set;
 
     bytes32 public constant BALLOT_TYPEHASH =
         keccak256("Ballot(uint256 proposalId,uint8 support,address voter,uint256 nonce)");
@@ -45,6 +45,8 @@ abstract contract Governor is Context, ERC165, EIP712, Nonces, IGovernor, IERC72
     }
 
     bytes32 private constant ALL_PROPOSAL_STATES_BITMAP = bytes32((2 ** (uint8(type(ProposalState).max) + 1)) - 1);
+    uint256 private constant CALL_DEPTH_SLOT_ID =
+        uint256(keccak256("openzeppelin.governance.Governor.execution.call.depth.slot.id"));
     string private _name;
 
     mapping(uint256 proposalId => ProposalCore) private _proposals;
@@ -53,7 +55,7 @@ abstract contract Governor is Context, ERC165, EIP712, Nonces, IGovernor, IERC72
     // modifier needs to be whitelisted in this queue. Whitelisting is set in {execute}, consumed by the
     // {onlyGovernance} modifier and eventually reset after {_executeOperations} completes. This ensures that the
     // execution of {onlyGovernance} protected calls can only be achieved through successful proposals.
-    DoubleEndedQueue.Bytes32Deque private _governanceCall;
+    EnumerableSet.Bytes32Set private _governanceCall; // TODO: Allow duplicates
 
     /**
      * @dev Restricts a function so it can only be executed through governance proposals. For example, governance
@@ -217,9 +219,15 @@ abstract contract Governor is Context, ERC165, EIP712, Nonces, IGovernor, IERC72
             revert GovernorOnlyExecutor(_msgSender());
         }
         if (_executor() != address(this)) {
-            bytes32 msgDataHash = keccak256(_msgData());
-            // loop until popping the expected operation - throw if deque is empty (operation not authorized)
-            while (_governanceCall.popFront() != msgDataHash) {}
+            bytes32 msgDataHash = keccak256(abi.encodePacked(_callDepth(), _msgData()));
+            // loop until the expected operation is found
+            for (uint256 i = 0; i < _governanceCall.length(); ++i) {
+                if (_governanceCall.at(i) == msgDataHash) {
+                    _governanceCall.remove(msgDataHash);
+                    return;
+                }
+            }
+            revert GovernorOnlyWhitelistedCall(_msgSender(), msgDataHash); // revert if operation not authorized
         }
     }
 
@@ -403,22 +411,19 @@ abstract contract Governor is Context, ERC165, EIP712, Nonces, IGovernor, IERC72
 
         // mark as executed before calls to avoid reentrancy
         _proposals[proposalId].executed = true;
+        _increaseCallDepth();
 
         // before execute: register governance call in queue.
         if (_executor() != address(this)) {
             for (uint256 i = 0; i < targets.length; ++i) {
                 if (targets[i] == address(this)) {
-                    _governanceCall.pushBack(keccak256(calldatas[i]));
+                    _governanceCall.add(keccak256(abi.encodePacked(_callDepth(), calldatas[i])));
                 }
             }
         }
 
         _executeOperations(proposalId, targets, values, calldatas, descriptionHash);
-
-        // after execute: cleanup governance call queue.
-        if (_executor() != address(this) && !_governanceCall.empty()) {
-            _governanceCall.clear();
-        }
+        _decreaseCallDepth();
 
         emit ProposalExecuted(proposalId);
 
@@ -816,5 +821,23 @@ abstract contract Governor is Context, ERC165, EIP712, Nonces, IGovernor, IERC72
         assembly ("memory-safe") {
             value := mload(add(add(buffer, 0x20), offset))
         }
+    }
+
+    /**
+     * @dev Get current execution call depth. Stored in a random proposal to avoid adding a dedicated state variable.
+     * This is used to track nested calls during proposal execution.
+     */
+    function _callDepth() private view returns (uint256) {
+        return _proposals[CALL_DEPTH_SLOT_ID].voteStart;
+    }
+
+    /// @dev Increase execution call depth by one.
+    function _increaseCallDepth() private {
+        ++_proposals[CALL_DEPTH_SLOT_ID].voteStart;
+    }
+
+    /// @dev Decrease execution call depth by one.
+    function _decreaseCallDepth() private {
+        --_proposals[CALL_DEPTH_SLOT_ID].voteStart;
     }
 }

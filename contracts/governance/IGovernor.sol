@@ -45,6 +45,11 @@ interface IGovernor is IERC165, IERC6372 {
     error GovernorOnlyExecutor(address account);
 
     /**
+     * @dev The `msg.data` is not whitelisted for execution by the governance executor.
+     */
+    error GovernorOnlyWhitelistedCall(address caller, bytes32 msgDataHash);
+
+    /**
      * @dev The `proposalId` doesn't exist.
      */
     error GovernorNonexistentProposal(uint256 proposalId);
