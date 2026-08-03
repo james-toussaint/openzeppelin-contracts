@@ -54,4 +54,6 @@ runs:
       uses: marocchino/sticky-pull-request-comment@v3
       with:
         message: |
-          $GITHUB_STEP_SUMMARY
+          ```
+          echo $GITHUB_STEP_SUMMARY
+          ```
