@@ -56,6 +56,8 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
 
     bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
 
+    event Test();
+
     /**
      * @dev Modifier that checks that an account has a specific role. Reverts
      * with an {AccessControlUnauthorizedAccount} error including the required role.
@@ -178,6 +180,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
      * May emit a {RoleGranted} event.
      */
     function _grantRole(bytes32 role, address account) internal virtual returns (bool) {
+        emit Test();
         if (!hasRole(role, account)) {
             _roles[role].hasRole[account] = true;
             emit RoleGranted(role, account, _msgSender());

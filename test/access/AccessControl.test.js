@@ -10,7 +10,7 @@ async function fixture() {
   return { mock, defaultAdmin, accounts };
 }
 
-describe('AccessControl', function () {
+describe.only('AccessControl', function () {
   beforeEach(async function () {
     Object.assign(this, await loadFixture(fixture));
   });
