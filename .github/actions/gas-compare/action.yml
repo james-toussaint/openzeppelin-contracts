@@ -33,7 +33,7 @@ runs:
     - name: Compare reports
       if: steps.reference.outcome == 'success' && github.event_name == 'pull_request'
       run: |
-        node scripts/checks/compareGasReports.js ${{ inputs.report }} ${{ inputs.ref_report }} >> $GITHUB_STEP_SUMMARY
+        node scripts/checks/compareGasReports.js ${{ inputs.report }} ${{ inputs.ref_report }} >> report.md
       env:
         STYLE: markdown
       shell: bash
@@ -49,3 +49,8 @@ runs:
         name: gasreport
         overwrite: true
         path: ${{ inputs.out_report }}
+    - name: Post comment
+      if: github.event_name == 'pull_request'
+      uses: marocchino/sticky-pull-request-comment@v3
+      with:
+        path: report.md
