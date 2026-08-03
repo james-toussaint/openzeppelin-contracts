@@ -49,3 +49,9 @@ runs:
         name: gasreport
         overwrite: true
         path: ${{ inputs.out_report }}
+    - name: Post comment
+      if: github.event_name == 'pull_request'
+      uses: marocchino/sticky-pull-request-comment@v3
+      with:
+        message: |
+          $GITHUB_STEP_SUMMARY
