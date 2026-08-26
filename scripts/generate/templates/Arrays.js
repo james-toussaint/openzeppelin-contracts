@@ -45,10 +45,26 @@ function sort(
  * @dev Variant of {sort} that sorts an array of ${type.name} in increasing order.
  */
 function sort(${type.name}[] memory array) internal pure returns (${type.name}[] memory) {
-    ${type.name === 'uint256' ? 'sort(array, Comparators.lt);' : 'sort(_castToUint256Array(array), Comparators.lt);'}
+    ${
+      type.name === 'uint256'
+        ? 'sort(array, Comparators.lt);'
+        : type.name === 'address'
+          ? 'sort(_castToUint256Array(array), _castToUint256Comp(_lt));'
+          : 'sort(_castToUint256Array(array), Comparators.lt);'
+    }
     return array;
-}
+}${type.name === 'address' ? addressLt : ''}
 `;
+
+const addressLt = `\
+
+
+/**
+ * @dev Private comparator function for addresses that returns true if \`a\` is less than \`b\`.
+ */
+function _lt(address a, address b) private pure returns (bool) {
+    return a < b;
+}`;
 
 const quickSort = `\
 /**

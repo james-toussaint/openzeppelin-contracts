@@ -70,8 +70,15 @@ library Arrays {
      * @dev Variant of {sort} that sorts an array of address in increasing order.
      */
     function sort(address[] memory array) internal pure returns (address[] memory) {
-        sort(_castToUint256Array(array), Comparators.lt);
+        sort(_castToUint256Array(array), _castToUint256Comp(_lt));
         return array;
+    }
+
+    /**
+     * @dev Private comparator function for addresses that returns true if `a` is less than `b`.
+     */
+    function _lt(address a, address b) private pure returns (bool) {
+        return a < b;
     }
 
     /**

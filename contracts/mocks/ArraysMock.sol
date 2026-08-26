@@ -92,6 +92,12 @@ contract AddressArraysMock {
     }
 }
 
+contract AddressArraysCalldataMock {
+    function sort(address[] calldata array) external pure returns (address[] memory) {
+        return Arrays.sort(array);
+    }
+}
+
 contract Bytes32ArraysMock {
     using Arrays for bytes32[];
 

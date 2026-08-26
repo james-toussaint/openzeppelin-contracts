@@ -288,4 +288,25 @@ describe('Arrays', function () {
       });
     });
   }
+
+  it('sort addresses having dirty prefixes', async function () {
+    const instance = await ethers.deployContract('AddressArraysCalldataMock', []);
+    const [address1, address2, address3] = ['0x01', '0x02', '0x03'].map(x => ethers.zeroPadValue(x, 20)); // canonical addresses
+    expect(
+      instance.interface.decodeFunctionResult(
+        'sort',
+        await ethers.provider.call({
+          to: instance.target,
+          data: ethers.concat([
+            instance.interface.getFunction('sort').selector,
+            ethers.zeroPadValue('0x20', 32), // offset
+            ethers.zeroPadValue('0x03', 32), // length
+            ethers.zeroPadValue(ethers.concat(['0xdd', address3]), 32), // prefix each address with junk
+            ethers.zeroPadValue(ethers.concat(['0xee', address2]), 32),
+            ethers.zeroPadValue(ethers.concat(['0xff', address1]), 32),
+          ]),
+        }),
+      )[0],
+    ).to.deep.equal([address1, address2, address3]);
+  });
 });
