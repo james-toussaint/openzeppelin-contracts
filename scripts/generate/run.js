@@ -25,6 +25,7 @@ for (const [filepath, needsPrettier] of Object.entries({
   'contracts/utils/math/SafeCast.sol': false,
   'contracts/utils/structs/Checkpoints.sol': false,
   'contracts/utils/structs/EnumerableMap.sol': true,
+  'contracts/utils/structs/Heap.sol': true,
   'contracts/utils/structs/EnumerableSet.sol': false,
   'test/utils/Packing.t.sol': false,
   'test/utils/SlotDerivation.t.sol': false,

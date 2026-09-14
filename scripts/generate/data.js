@@ -82,6 +82,21 @@ export const MAP_TYPES = []
     value,
   }));
 
+// ─── Heap ───
+// One entry per supported value width. Widths below 256 pack `256 / size` values per storage slot; the
+// packed-access shifts are all derived from `size` (see the `.eta` template's assembly accessors).
+export const HEAP_TYPES = [256, 128, 64, 32].map(size => ({
+  size,
+  name: `Uint${size}Heap`,
+  valueType: `uint${size}`,
+  packed: size < 256,
+  perSlot: 256 / size,
+  blockShift: Math.log2(256 / size), // element index -> slot offset: shr(blockShift, index)
+  offsetMask: 256 / size - 1, // element index -> position in slot: and(index, offsetMask)
+  valueShift: Math.log2(size), // position in slot -> bit shift: shl(valueShift, position)
+  maskShift: 256 - size, // low `size` bits mask: shr(maskShift, not(0))
+}));
+
 // ─── MerkleProof ───
 export const MERKLEPROOF_DEFAULT_HASH = 'Hashes.commutativeKeccak256';
 export const MERKLEPROOF_OPTS = product(
